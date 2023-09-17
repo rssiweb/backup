@@ -1,0 +1,26 @@
+version: 2
+
+locations:
+  db-dumps:
+    from: /home/worker/db-dumps
+    to: bb
+    hooks:
+      before:
+        - /home/worker/create_dump_db.sh
+      after:
+        - /home/worker/clear_dump_dir.sh
+      success:
+        - /home/worker/send_email_update.sh SUCCESS
+      failure:
+        - /home/worker/send_email_update.sh FAILED
+    cron: '0 0 * * *' # daily
+    options:
+      forget:
+        keep-daily: 7
+        keep-weekly: 4
+        keep-monthly: 6
+
+backends:
+  bb:
+    type: b2
+    path: 'rssi-db'
